@@ -20,17 +20,19 @@ const StrategiesTab = ({ params, stats }) => {
     const [waferCost, setWaferCost] = useState(5000);
     const [repairPct, setRepairPct] = useState(0); // 0-100%
     const [scribeWidth, setScribeWidth] = useState(0.1); // mm
+    const [fabUtilization, setFabUtilization] = useState(95); // 50-100%
 
     // Economics Calculation
     const economics = useMemo(() => {
         // Effective Yield consideration
         const effectiveYield = calculateEffectiveYield(params, repairPct);
         const goodDies = calculateGoodDies(stats.totalDies, effectiveYield);
-        const cpgd = calculateEconomics(waferCost, goodDies);
+        // Pass fabUtilization as decimal (0-1)
+        const cpgd = calculateEconomics(waferCost, goodDies, fabUtilization / 100);
         const revenue = goodDies * (cpgd * 1.5); // Mock markup
 
         return { effectiveYield, goodDies, cpgd, revenue };
-    }, [params, stats.totalDies, waferCost, repairPct]);
+    }, [params, stats.totalDies, waferCost, repairPct, fabUtilization]);
 
     // Cost Curve Data Generation
     const costCurveData = useMemo(() => {
@@ -40,7 +42,7 @@ const StrategiesTab = ({ params, stats }) => {
             const simParams = { ...params, d0: d };
             const y = calculateEffectiveYield(simParams, repairPct);
             const g = calculateGoodDies(stats.totalDies, y);
-            const c = calculateEconomics(waferCost, g);
+            const c = calculateEconomics(waferCost, g, fabUtilization / 100);
             data.push({
                 d0: d.toFixed(1),
                 yield: (y * 100).toFixed(0),
@@ -67,6 +69,19 @@ const StrategiesTab = ({ params, stats }) => {
                                 value={waferCost}
                                 onChange={e => setWaferCost(Number(e.target.value))}
                                 className="w-full bg-[#0B1020] border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+                        <div>
+                            <div className="flex justify-between mb-2">
+                                <label className="text-sm text-gray-400">Fab Utilization</label>
+                                <span className="text-sm font-mono text-blue-400">{fabUtilization}%</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="50" max="100" step="1"
+                                value={fabUtilization}
+                                onChange={e => setFabUtilization(Number(e.target.value))}
+                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                             />
                         </div>
                         <div className="pt-4 border-t border-white/5">
