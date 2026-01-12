@@ -13,18 +13,31 @@ function App() {
     dieArea: 100,
     d0: 0.5,
     alpha: 2.0,
-    model: 'poisson' // poisson, murphy, nb
+    model: 'poisson', // poisson, murphy, nb
+    // New parameters for upgraded logic
+    edgeExclusion: 3,      // mm (default 3mm edge exclusion)
+    patternDensity: 0.7,   // Critical area ratio (0-1, default 70%)
+    processMaturity: 0.95, // Systematic yield cap (0-1, default 95%)
+    fabUtilization: 0.95   // Fab utilization (0-1, default 95%)
   });
 
   // Derived metrics (Shared across tabs if needed)
   const stats = useMemo(() => {
-    const yieldRate = calculateYield(params.model, params.d0, params.dieArea, params.alpha);
-    const totalDies = calculateGrossDies(params.diameter, params.dieArea);
+    const yieldRate = calculateYield(
+      params.model,
+      params.d0,
+      params.dieArea,
+      params.alpha,
+      params.patternDensity,
+      params.processMaturity
+    );
+    const totalDies = calculateGrossDies(params.diameter, params.dieArea, params.edgeExclusion);
     const goodDies = calculateGoodDies(totalDies, yieldRate);
-    const efficiency = calculateEfficiency(totalDies, params.dieArea, params.diameter);
+    const efficiency = calculateEfficiency(totalDies, params.dieArea, params.diameter, params.edgeExclusion);
 
     return { yieldRate, totalDies, goodDies, efficiency };
   }, [params]);
+
 
   return (
     <div className="min-h-screen bg-[#0B1020] text-gray-100 font-sans selection:bg-blue-500/30 flex flex-col">
@@ -46,5 +59,7 @@ function App() {
     </div>
   );
 }
+
+export default App;
 
 export default App;
