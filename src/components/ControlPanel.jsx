@@ -91,6 +91,44 @@ const ControlPanel = ({
                 />
             </div>
 
+            {/* Advanced Parameters Section */}
+            <div className="mt-6 pt-6 border-t border-white/10">
+                <h3 className="text-sm font-medium text-gray-500 mb-4">Advanced Parameters</h3>
+
+                {/* Edge Exclusion */}
+                <RangeSlider
+                    label="Edge Exclusion"
+                    value={params.edgeExclusion}
+                    min={0}
+                    max={10}
+                    step={0.5}
+                    onChange={(v) => updateParam('edgeExclusion', v)}
+                    unit="mm"
+                />
+
+                {/* Pattern Density (Critical Area) */}
+                <RangeSlider
+                    label="Pattern Density"
+                    value={Math.round(params.patternDensity * 100)}
+                    min={30}
+                    max={100}
+                    step={5}
+                    onChange={(v) => updateParam('patternDensity', v / 100)}
+                    unit="%"
+                />
+
+                {/* Process Maturity (Systematic Yield) */}
+                <RangeSlider
+                    label="Process Maturity"
+                    value={Math.round(params.processMaturity * 100)}
+                    min={80}
+                    max={100}
+                    step={1}
+                    onChange={(v) => updateParam('processMaturity', v / 100)}
+                    unit="%"
+                />
+            </div>
+
             {/* Model Selector */}
             <div className="mt-8">
                 <label className="text-sm font-medium text-gray-400 block mb-3">Yield Model</label>
@@ -100,8 +138,8 @@ const ControlPanel = ({
                             key={m.id}
                             onClick={() => updateParam('model', m.id)}
                             className={`py-2 px-2 text-xs font-medium rounded-md transition-all ${params.model === m.id
-                                    ? 'bg-blue-600 text-white shadow-lg'
-                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                ? 'bg-blue-600 text-white shadow-lg'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
                                 }`}
                         >
                             {m.label}
